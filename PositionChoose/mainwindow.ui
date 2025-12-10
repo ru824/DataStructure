@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1400</width>
+    <height>900</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>邮局选址问题 - 最短路径算法求解</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+/* 全局通用样式 */
+QWidget {
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+}
+/* 网格绘图区底层容器 - 专门承载XY网格 */
+#gridContainer {
+    background-color: #ffffff;
+    border-radius: 16px;
+    margin: 15px;
+}
+/* 左侧面板样式 - 悬浮感，不遮挡网格 */
+#frame {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #f9fafb, stop:1 #f1f3f5);
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    /* 面板轻微悬浮，不遮挡网格 */
+    margin: 15px 0 15px 15px;
+}
+QLabel {
+    color: #333333;
+}
+QPushButton {
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+QPushButton:hover {
+    transform: translateY(-2px);
+}
+QPushButton:pressed {
+    transform: translateY(0);
+}
+   </string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <!-- 底层网格容器：承载XY网格，铺满整个centralwidget -->
+   <widget class="QWidget" name="gridContainer">
+    <layout class="QHBoxLayout" name="rootLayout">
+     <property name="spacing">
+      <number>0</number> <!-- 消除布局间距，避免网格被切割 -->
+     </property>
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <!-- 左侧面板：固定宽度，不挤压网格区 -->
+     <item>
+      <widget class="QFrame" name="frame">
+       <property name="minimumSize">
+        <size>
+         <width>320</width>
+         <height>700</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>350</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::Shape::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Shadow::Raised</enum>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="spacing">
+         <number>15</number>
+        </property>
+        <property name="leftMargin">
+         <number>5</number>
+        </property>
+        <property name="topMargin">
+         <number>5</number>
+        </property>
+        <property name="rightMargin">
+         <number>5</number>
+        </property>
+        <property name="bottomMargin">
+         <number>5</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="styleSheet">
+           <string notr="true">
+font-size: 26px;
+font-weight: 700;
+color: white;
+background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #4361ee, stop:1 #3a0ca3);
+padding: 20px;
+border-radius: 12px;
+margin-bottom: 10px;
+box-shadow: 0 4px 8px rgba(67, 97, 238, 0.2);
+text-align: center;
+           </string>
+          </property>
+          <property name="text">
+           <string>🏤 邮局选址问题</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignmentFlag::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="styleSheet">
+           <string notr="true">
+font-size: 18px;
+font-weight: 600;
+color: #2d3748;
+background-color: #edf2f7;
+padding: 12px 16px;
+border-radius: 8px;
+border-left: 4px solid #4361ee;
+           </string>
+          </property>
+          <property name="text">
+           <string>📋 操作说明</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_3">
+          <property name="styleSheet">
+           <string notr="true">
+font-size: 14px;
+color: #4a5568;
+background-color: white;
+padding: 16px;
+border-radius: 8px;
+border: 1px solid #e2e8f0;
+line-height: 1.8;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+           </string>
+          </property>
+          <property name="text">
+           <string>• 🖱️ 点击右侧绘图区域添加居民小区
+• ⚡ 使用下方按钮进行相关操作
+• 📊 系统自动计算最优邮局位置
+• 🔄 支持清空和随机生成功能
+• 📏 使用曼哈顿距离优化算法</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Orientation::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnCalculate">
+          <property name="styleSheet">
+           <string notr="true">
+QPushButton {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #4361ee, stop:1 #3a0ca3);
+    color: white;
+    border: none;
+    padding: 16px 24px;
+    font-size: 16px;
+    min-height: 50px;
+    box-shadow: 0 4px 8px rgba(67, 97, 238, 0.2);
+}
+QPushButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3a0ca3, stop:1 #2a0878);
+    box-shadow: 0 6px 12px rgba(67, 97, 238, 0.3);
+}
+QPushButton:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #2a0878, stop:1 #1e0659);
+}
+           </string>
+          </property>
+          <property name="text">
+           <string>📊 计算最优邮局位置</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnClear">
+          <property name="styleSheet">
+           <string notr="true">
+QPushButton {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ef4444, stop:1 #dc2626);
+    color: white;
+    border: none;
+    padding: 16px 24px;
+    font-size: 16px;
+    min-height: 50px;
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.2);
+}
+QPushButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #dc2626, stop:1 #b91c1c);
+    box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3);
+}
+QPushButton:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #b91c1c, stop:1 #991b1b);
+}
+           </string>
+          </property>
+          <property name="text">
+           <string>🗑️ 清空所有小区</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnRandom">
+          <property name="styleSheet">
+           <string notr="true">
+QPushButton {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #10b981, stop:1 #059669);
+    color: white;
+    border: none;
+    padding: 16px 24px;
+    font-size: 16px;
+    min-height: 50px;
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.2);
+}
+QPushButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #059669, stop:1 #047857);
+    box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3);
+}
+QPushButton:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #047857, stop:1 #065f46);
+}
+           </string>
+          </property>
+          <property name="text">
+           <string>🎲 随机生成小区</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Orientation::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_4">
+          <property name="styleSheet">
+           <string notr="true">
+font-size: 18px;
+font-weight: 600;
+color: #2d3748;
+background-color: #edf2f7;
+padding: 12px 16px;
+border-radius: 8px;
+border-left: 4px solid #4361ee;
+           </string>
+          </property>
+          <property name="text">
+           <string>🧮 算法信息</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lblAlgorithmInfo">
+          <property name="styleSheet">
+           <string notr="true">
+font-size: 14px;
+color: #4a5568;
+background-color: white;
+padding: 16px;
+border-radius: 8px;
+border: 1px solid #e2e8f0;
+line-height: 1.8;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+           </string>
+          </property>
+          <property name="text">
+           <string>• 📊 使用中位数方法求解
+• 📏 曼哈顿距离最小化
+• ⚡ 时间复杂度：O(n)
+• ✅ 保证最优解
+• 🎯 支持动态添加小区</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <!-- 右侧网格绘图区：自动填充剩余空间，承载XY网格 -->
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="styleSheet">
+        <string notr="true">
+background-color: transparent;
+/* 绘图区内边距，避免网格贴边 */
+padding: 20px;
+        </string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <!-- 允许绘图区扩展，铺满右侧 -->
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>1</horstretch>
+         <verstretch>1</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1400</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">
+background-color: #f8fafc;
+border: none;
+    </string>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="styleSheet">
+    <string notr="true">
+background-color: #f8fafc;
+color: #4a5568;
+border-top: 1px solid #e2e8f0;
+    </string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
