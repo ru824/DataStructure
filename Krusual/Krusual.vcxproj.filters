@@ -24,9 +24,6 @@
     <ClInclude Include="UnionFind.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="HeapSort.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="GraphFileIO.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -42,9 +39,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="UnionFind.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="HeapSort.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="GraphFileIO.cpp">

@@ -1,144 +1,149 @@
+ï»¿/**
+ * @file Graph.cpp
+ * @brief å›¾æ•°æ®ç»“æ„å®ç°æ–‡ä»¶ï¼ŒåŒ…å«å›¾çš„åˆ›å»ºã€æ“ä½œå’ŒKruskalç®—æ³•
+ * @class Graph
+ * @brief å›¾ç±»ï¼Œä½¿ç”¨è¾¹æ•°ç»„å­˜å‚¨å›¾ç»“æ„ï¼Œé’ˆå¯¹Kruskalç®—æ³•ä¼˜åŒ–
+ *
+ * Kruskalç®—æ³•ä»¥è¾¹ä¸ºæ ¸å¿ƒæ“ä½œï¼Œä½¿ç”¨è¾¹æ•°ç»„å­˜å‚¨å¯ä»¥ç›´æ¥å¯¹è¾¹è¿›è¡Œæ’åºå’Œç­›é€‰ï¼Œæ¯”é‚»æ¥çŸ©é˜µæ›´é«˜æ•ˆ[3,5](@ref)ã€‚
+ */
+
 #include "Graph.h"
 #include "UnionFind.h"
-#include "HeapSort.h"
 #include <iostream>
 #include <algorithm>
 #include <climits>
 
-// ¹¹Ôìº¯Êı£º³õÊ¼»¯Í¼½á¹¹
+ /**
+  * @brief å›¾ç±»æ„é€ å‡½æ•°
+  * @param v å›¾ä¸­é¡¶ç‚¹æ•°é‡ï¼Œå¿…é¡»ä¸ºæ­£æ•´æ•°
+  * @exception std::invalid_argument å½“v<=0æ—¶æŠ›å‡ºå¼‚å¸¸
+  * @note åˆå§‹åŒ–è¾¹æ•°ç»„ï¼Œæ”¾å¼ƒé‚»æ¥çŸ©é˜µå­˜å‚¨æ–¹å¼ï¼Œä¸“æ³¨äºKruskalç®—æ³•éœ€æ±‚[3,5](@ref)
+  */
 Graph::Graph(int v) : vertices(v), edgeCount(0), maxEdges(v* (v - 1) / 2) {
-    // ÊäÈëÑéÖ¤
+    // è¾“å…¥éªŒè¯
     if (v <= 0) {
-        std::cerr << "´íÎó£º¶¥µãÊı±ØĞëÎªÕıÕûÊı" << std::endl;
+        std::cerr << "é”™è¯¯ï¼šé¡¶ç‚¹æ•°å¿…é¡»ä¸ºæ­£æ•´æ•°" << std::endl;
         vertices = 1;
         maxEdges = 0;
     }
 
-    // ·ÖÅäÁÚ½Ó¾ØÕóÄÚ´æ
-    adjMatrix = new int* [vertices];
-    for (int i = 0; i < vertices; ++i) {
-        adjMatrix[i] = new int[vertices];
-    }
-
-    // ³õÊ¼»¯ÁÚ½Ó¾ØÕó
-    for (int i = 0; i < vertices; ++i) {
-        for (int j = 0; j < vertices; ++j) {
-            if (i == j) {
-                adjMatrix[i][j] = 0;  // ¶¥µãµ½×ÔÉí¾àÀëÎª0
-            }
-            else {
-                adjMatrix[i][j] = INF; // ³õÊ¼»¯ÎªÎŞÇî´ó
-            }
-        }
-    }
-
-    // ·ÖÅä±ßÊı×éÄÚ´æ
+    // åˆ†é…è¾¹æ•°ç»„å†…å­˜
     edgesArray = new Edge * [maxEdges];
     for (int i = 0; i < maxEdges; ++i) {
         edgesArray[i] = nullptr;
     }
+
+    std::cout << "å›¾åˆå§‹åŒ–å®Œæˆï¼šé¡¶ç‚¹æ•°=" << vertices
+        << ", æœ€å¤§è¾¹æ•°=" << maxEdges << std::endl;
 }
 
-// Îö¹¹º¯Êı£ºÊÍ·ÅËùÓĞÄÚ´æ
+/**
+ * @brief å›¾ç±»ææ„å‡½æ•°
+ * @note é‡Šæ”¾è¾¹æ•°ç»„å ç”¨çš„æ‰€æœ‰å†…å­˜èµ„æºï¼Œé˜²æ­¢å†…å­˜æ³„æ¼[1](@ref)
+ */
 Graph::~Graph() {
-    // ÊÍ·ÅÁÚ½Ó¾ØÕó
-    if (adjMatrix != nullptr) {
-        for (int i = 0; i < vertices; ++i) {
-            delete[] adjMatrix[i];
-        }
-        delete[] adjMatrix;
-    }
-
-    // ÊÍ·Å±ßÊı×é
+    // é‡Šæ”¾è¾¹æ•°ç»„
     if (edgesArray != nullptr) {
         for (int i = 0; i < maxEdges; ++i) {
             delete edgesArray[i];
         }
         delete[] edgesArray;
     }
+    std::cout << "å›¾èµ„æºå·²é‡Šæ”¾" << std::endl;
 }
 
-// Ìí¼Ó±ßµ½Í¼ÖĞ
+/**
+ * @brief å‘å›¾ä¸­æ·»åŠ æ— å‘è¾¹
+ * @param u è¾¹çš„èµ·å§‹é¡¶ç‚¹ç´¢å¼•ï¼ŒèŒƒå›´[0, vertices-1]
+ * @param v è¾¹çš„ç›®æ ‡é¡¶ç‚¹ç´¢å¼•ï¼ŒèŒƒå›´[0, vertices-1]
+ * @param weight è¾¹çš„æƒé‡å€¼
+ * @exception std::out_of_range å½“é¡¶ç‚¹ç´¢å¼•è¶Šç•Œæ—¶è¾“å‡ºé”™è¯¯ä¿¡æ¯
+ * @note å¯¹äºæ— å‘å›¾ï¼Œç¡®ä¿u < vä»¥é¿å…é‡å¤å­˜å‚¨ï¼Œæé«˜Kruskalç®—æ³•æ•ˆç‡[3,7](@ref)
+ */
 void Graph::addEdge(int u, int v, int weight) {
-    // ±ß½ç¼ì²é
+    // è¾¹ç•Œæ£€æŸ¥
     if (u < 0 || u >= vertices || v < 0 || v >= vertices) {
-        std::cerr << "´íÎó£º¶¥µãË÷ÒıÔ½½ç (" << u << ", " << v << ")" << std::endl;
+        std::cerr << "é”™è¯¯ï¼šé¡¶ç‚¹ç´¢å¼•è¶Šç•Œ (" << u << ", " << v << ")" << std::endl;
         return;
     }
 
     if (u == v) {
-        std::cerr << "¾¯¸æ£ººöÂÔ×Ô»·±ß (" << u << "->" << v << ")" << std::endl;
+        std::cerr << "è­¦å‘Šï¼šå¿½ç•¥è‡ªç¯è¾¹ (" << u << "->" << v << ")" << std::endl;
         return;
     }
 
-    // ÉèÖÃË«Ïò±ß£¨ÎŞÏòÍ¼£©
-    adjMatrix[u][v] = weight;
-    adjMatrix[v][u] = weight;
+    // ç»Ÿä¸€å¤„ç†ä¸ºu < vçš„å½¢å¼ï¼Œé¿å…æ— å‘å›¾ä¸­çš„é‡å¤è¾¹[7](@ref)
+    if (u > v) {
+        std::swap(u, v);
+    }
 
-    // Ìí¼Óµ½±ßÊı×é£¨±ÜÃâÖØ¸´£¬Ö»´æ´¢u<vµÄ±ß£©
-    if (u < v && edgeCount < maxEdges) {
-        // ¼ì²é±ßÊÇ·ñÒÑ´æÔÚ
-        for (int i = 0; i < edgeCount; ++i) {
-            if (edgesArray[i] != nullptr &&
-                edgesArray[i]->getSrc() == u && edgesArray[i]->getDest() == v) {
-                // ±ßÒÑ´æÔÚ£¬¸üĞÂÈ¨ÖØ
-                edgesArray[i]->setWeight(weight);
-                return;
-            }
+    // æ£€æŸ¥è¾¹æ˜¯å¦å·²å­˜åœ¨
+    for (int i = 0; i < edgeCount; ++i) {
+        if (edgesArray[i] != nullptr &&
+            edgesArray[i]->getSrc() == u && edgesArray[i]->getDest() == v) {
+            // è¾¹å·²å­˜åœ¨ï¼Œæ›´æ–°æƒé‡
+            std::cout << "æ›´æ–°è¾¹æƒé‡: " << u << " - " << v
+                << " æ—§æƒé‡: " << edgesArray[i]->getWeight()
+                << " -> æ–°æƒé‡: " << weight << std::endl;
+            edgesArray[i]->setWeight(weight);
+            return;
         }
+    }
 
-        // Ìí¼ÓĞÂ±ß
-        edgesArray[edgeCount] = new Edge(u, v, weight);
-        edgeCount++;
+    // æ£€æŸ¥è¾¹æ•°æ˜¯å¦è¶…å‡ºé™åˆ¶
+    if (edgeCount >= maxEdges) {
+        std::cerr << "é”™è¯¯ï¼šè¾¹æ•°å·²è¾¾ä¸Šé™ " << maxEdges << "ï¼Œæ— æ³•æ·»åŠ æ–°è¾¹" << std::endl;
+        return;
     }
-    else if (edgeCount >= maxEdges) {
-        std::cerr << "´íÎó£º±ßÊıÒÑ´ïÉÏÏŞ£¬ÎŞ·¨Ìí¼ÓĞÂ±ß" << std::endl;
-    }
+
+    // æ·»åŠ æ–°è¾¹
+    edgesArray[edgeCount] = new Edge(u, v, weight);
+    edgeCount++;
+    std::cout << "æ·»åŠ è¾¹æˆåŠŸ: " << u << " - " << v << " æƒé‡: " << weight
+        << " (æ€»è¾¹æ•°: " << edgeCount << ")" << std::endl;
 }
 
-// ´òÓ¡Í¼µÄÁÚ½Ó¾ØÕó
+/**
+ * @brief æ‰“å°å›¾çš„è¾¹åˆ—è¡¨ä¿¡æ¯
+ * @note ä»…æ‰“å°è¾¹æ•°ç»„å†…å®¹ï¼Œä¸å†æ˜¾ç¤ºé‚»æ¥çŸ©é˜µ[5](@ref)
+ */
 void Graph::printGraph() const {
-    std::cout << "Í¼µÄÁÚ½Ó¾ØÕó (" << vertices << "¡Á" << vertices << "):" << std::endl;
+    std::cout << "\nå›¾ä¿¡æ¯æ¦‚è§ˆ:" << std::endl;
+    std::cout << "é¡¶ç‚¹æ•°: " << vertices << std::endl;
+    std::cout << "è¾¹æ•°: " << edgeCount << std::endl;
 
-    // ´òÓ¡ÁĞ±êÌâ
-    std::cout << "    ";
-    for (int j = 0; j < vertices; ++j) {
-        std::cout << j << "\t";
-    }
-    std::cout << std::endl;
-
-    // ´òÓ¡¾ØÕóÄÚÈİ
-    for (int i = 0; i < vertices; ++i) {
-        std::cout << i << " | ";
-        for (int j = 0; j < vertices; ++j) {
-            if (adjMatrix[i][j] == INF) {
-                std::cout << "INF\t";
-            }
-            else {
-                std::cout << adjMatrix[i][j] << "\t";
-            }
-        }
-        std::cout << std::endl;
+    if (edgeCount == 0) {
+        std::cout << "å›¾ä¸­æ²¡æœ‰è¾¹" << std::endl;
+        return;
     }
 
-    // ´òÓ¡±ßĞÅÏ¢
-    std::cout << "\n±ßÁĞ±í (" << edgeCount << " Ìõ±ß):" << std::endl;
+    std::cout << "\nè¾¹åˆ—è¡¨ (" << edgeCount << " æ¡è¾¹):" << std::endl;
+    std::cout << "åºå·\tèµ·ç‚¹\tç»ˆç‚¹\tæƒé‡" << std::endl;
+    std::cout << "----------------------------" << std::endl;
+
     for (int i = 0; i < edgeCount; ++i) {
         if (edgesArray[i] != nullptr) {
-            std::cout << "±ß " << i << ": " << edgesArray[i]->getSrc() << " - "
-                << edgesArray[i]->getDest() << " È¨ÖØ: " << edgesArray[i]->getWeight() << std::endl;
+            std::cout << i << "\t" << edgesArray[i]->getSrc() << "\t"
+                << edgesArray[i]->getDest() << "\t"
+                << edgesArray[i]->getWeight() << std::endl;
         }
     }
     std::cout << std::endl;
 }
-
-// ¶ÑÅÅĞòÏà¹Ø·½·¨ÊµÏÖ
-void Graph::heapify(Edge* edges[], int n, int i, Edge* temp) const{
+/**
+ * @brief å †æ’åºçš„å †åŒ–æ“ä½œ
+ * @param edges è¾¹æŒ‡é’ˆæ•°ç»„
+ * @param n å½“å‰å †çš„å¤§å°
+ * @param i éœ€è¦å †åŒ–çš„å­æ ‘æ ¹èŠ‚ç‚¹ç´¢å¼•
+ * @param temp ä¸´æ—¶è¾¹å¯¹è±¡ï¼Œç”¨äºäº¤æ¢æ“ä½œ
+ * @note ç»´æŠ¤æœ€å¤§å †æ€§è´¨ï¼Œæ—¶é—´å¤æ‚åº¦O(log n)[1](@ref)
+ */
+void Graph::heapify(Edge* edges[], int n, int i, Edge* temp) const {
     int largest = i;
     int left = 2 * i + 1;
     int right = 2 * i + 2;
 
-    // ÕÒµ½×ó×Ó½Úµã¡¢ÓÒ×Ó½ÚµãºÍµ±Ç°½ÚµãÖĞµÄ×î´óÖµ
+    // æ‰¾åˆ°å·¦å­èŠ‚ç‚¹ã€å³å­èŠ‚ç‚¹å’Œå½“å‰èŠ‚ç‚¹ä¸­çš„æœ€å¤§å€¼[1](@ref)
     if (left < n && edges[left]->getWeight() > edges[largest]->getWeight()) {
         largest = left;
     }
@@ -147,9 +152,9 @@ void Graph::heapify(Edge* edges[], int n, int i, Edge* temp) const{
         largest = right;
     }
 
-    // Èç¹û×î´óÖµ²»ÊÇµ±Ç°½Úµã£¬½»»»²¢µİ¹éµ÷Õû
+    // å¦‚æœæœ€å¤§å€¼ä¸æ˜¯å½“å‰èŠ‚ç‚¹ï¼Œäº¤æ¢å¹¶é€’å½’è°ƒæ•´[1](@ref)
     if (largest != i) {
-        // Ê¹ÓÃµÚÈı¸öÊı×étemp×÷ÎªÁÙÊ±´æ´¢½øĞĞ½»»»
+        // ä½¿ç”¨ç¬¬ä¸‰ä¸ªæ•°ç»„tempä½œä¸ºä¸´æ—¶å­˜å‚¨è¿›è¡Œäº¤æ¢
         *temp = *edges[i];
         *edges[i] = *edges[largest];
         *edges[largest] = *temp;
@@ -158,65 +163,91 @@ void Graph::heapify(Edge* edges[], int n, int i, Edge* temp) const{
     }
 }
 
-void Graph::buildHeap(Edge* edges[], int n, Edge* temp) const{
-    // ´Ó×îºóÒ»¸ö·ÇÒ¶×Ó½Úµã¿ªÊ¼¹¹½¨¶Ñ
+/**
+ * @brief æ„å»ºæœ€å¤§å †
+ * @param edges è¾¹æŒ‡é’ˆæ•°ç»„
+ * @param n æ•°ç»„å¤§å°
+ * @param temp ä¸´æ—¶è¾¹å¯¹è±¡ï¼Œç”¨äºäº¤æ¢æ“ä½œ
+ * @note ä»æœ€åä¸€ä¸ªéå¶å­èŠ‚ç‚¹å¼€å§‹æ„å»ºå †ï¼Œæ—¶é—´å¤æ‚åº¦O(n)[1](@ref)
+ */
+void Graph::buildHeap(Edge* edges[], int n, Edge* temp) const {
+    // ä»æœ€åä¸€ä¸ªéå¶å­èŠ‚ç‚¹å¼€å§‹æ„å»ºå †[1](@ref)
     for (int i = n / 2 - 1; i >= 0; i--) {
         heapify(edges, n, i, temp);
     }
 }
 
+/**
+ * @brief å¯¹è¾¹æ•°ç»„è¿›è¡Œå †æ’åº
+ * @param edges è¾¹æŒ‡é’ˆæ•°ç»„
+ * @param n æ•°ç»„å¤§å°
+ * @note ä½¿ç”¨å †æ’åºç®—æ³•å¯¹è¾¹æŒ‰æƒé‡å‡åºæ’åˆ—ï¼Œæ—¶é—´å¤æ‚åº¦O(n log n)[1](@ref)
+ */
 void Graph::heapSortEdges(Edge* edges[], int n) const {
     if (n <= 1) return;
 
-    // ´´½¨µÚÈı¸öÊı×é×÷Îª¸¨Öú¿Õ¼ä
+    // åˆ›å»ºç¬¬ä¸‰ä¸ªæ•°ç»„ä½œä¸ºè¾…åŠ©ç©ºé—´
     Edge* temp = new Edge();
 
-    // ¹¹½¨×î´ó¶Ñ
+    // æ„å»ºæœ€å¤§å †[1](@ref)
     buildHeap(edges, n, temp);
 
-    // Öğ¸ö´Ó¶ÑÖĞÌáÈ¡ÔªËØ
+    // é€ä¸ªä»å †ä¸­æå–å…ƒç´ [1](@ref)
     for (int i = n - 1; i > 0; i--) {
-        // ½«µ±Ç°¶Ñ¶¥ÔªËØ£¨×î´óÖµ£©ÓëÄ©Î²ÔªËØ½»»»
+        // å°†å½“å‰å †é¡¶å…ƒç´ ï¼ˆæœ€å¤§å€¼ï¼‰ä¸æœ«å°¾å…ƒç´ äº¤æ¢
         *temp = *edges[0];
         *edges[0] = *edges[i];
         *edges[i] = *temp;
 
-        // µ÷ÕûÊ£ÓàÔªËØ£¬¶Ñ´óĞ¡¼õ1
+        // è°ƒæ•´å‰©ä½™å…ƒç´ ï¼Œå †å¤§å°å‡1
         heapify(edges, i, 0, temp);
     }
 
     delete temp;
 }
 
-// KruskalËã·¨ÊµÏÖ£¨ÓÅ»¯°æ£©
+
+/**
+ * @brief ä½¿ç”¨Kruskalç®—æ³•æ±‚è§£æœ€å°ç”Ÿæˆæ ‘
+ * @note åŸºäºå¹¶æŸ¥é›†å’Œå †æ’åºå®ç°ï¼Œä¸“é—¨ä¸ºè¾¹æ•°ç»„å­˜å‚¨ä¼˜åŒ–[3,5,7](@ref)
+ * @exception std::runtime_error å½“å›¾ä¸è¿é€šæ—¶æ— æ³•ç”Ÿæˆå®Œæ•´æœ€å°ç”Ÿæˆæ ‘
+ */
 void Graph::kruskalMST() const {
+    std::cout << "\n=== å¼€å§‹æ‰§è¡ŒKruskalç®—æ³• ===" << std::endl;
+
     if (edgeCount == 0) {
-        std::cout << "Í¼ÖĞÃ»ÓĞ±ß" << std::endl;
+        std::cout << "å›¾ä¸­æ²¡æœ‰è¾¹ï¼Œæ— æ³•ç”Ÿæˆæœ€å°ç”Ÿæˆæ ‘" << std::endl;
         return;
     }
 
     if (vertices <= 1) {
-        std::cout << "¶¥µãÊı²»×ã£¬ÎŞ·¨Éú³É×îĞ¡Éú³ÉÊ÷" << std::endl;
+        std::cout << "é¡¶ç‚¹æ•°ä¸è¶³ï¼Œæ— æ³•ç”Ÿæˆæœ€å°ç”Ÿæˆæ ‘" << std::endl;
         return;
     }
 
-    // ´´½¨±ßÖ¸ÕëÊı×éÓÃÓÚÅÅĞò
+    // åˆ›å»ºè¾¹æŒ‡é’ˆæ•°ç»„ç”¨äºæ’åºï¼ˆæ·±æ‹·è´ï¼‰
     Edge** edges = new Edge * [edgeCount];
     for (int i = 0; i < edgeCount; i++) {
-        edges[i] = new Edge(*edgesArray[i]); // Éî¿½±´
+        edges[i] = new Edge(*edgesArray[i]);
     }
 
-    // Ê¹ÓÃ¶ÑÅÅĞò¶Ô±ß°´È¨ÖØÅÅĞò
+    // ä½¿ç”¨å †æ’åºå¯¹è¾¹æŒ‰æƒé‡æ’åº
     heapSortEdges(edges, edgeCount);
+
+    std::cout << "è¾¹æŒ‰æƒé‡æ’åºå®Œæˆ:" << std::endl;
+    for (int i = 0; i < edgeCount; i++) {
+        std::cout << "è¾¹ " << i << ": " << edges[i]->getSrc() << " - "
+            << edges[i]->getDest() << " æƒé‡: " << edges[i]->getWeight() << std::endl;
+    }
 
     UnionFind uf(vertices);
     Edge** result = new Edge * [vertices - 1];
     int resultCount = 0;
     int totalWeight = 0;
 
-    std::cout << "KruskalËã·¨Ö´ĞĞ¹ı³Ì:" << std::endl;
+    std::cout << "\nå¼€å§‹æ„å»ºæœ€å°ç”Ÿæˆæ ‘:" << std::endl;
 
-    // ¹¹½¨×îĞ¡Éú³ÉÊ÷
+    // Kruskalç®—æ³•æ ¸å¿ƒï¼šéå†æ’åºåçš„è¾¹ï¼Œä½¿ç”¨å¹¶æŸ¥é›†é¿å…ç¯è·¯[3,7](@ref)
     for (int i = 0; i < edgeCount && resultCount < vertices - 1; i++) {
         Edge* currentEdge = edges[i];
         int u = currentEdge->getSrc();
@@ -227,28 +258,38 @@ void Graph::kruskalMST() const {
             result[resultCount] = new Edge(*currentEdge);
             totalWeight += currentEdge->getWeight();
 
-            std::cout << "Ìí¼Ó±ß: " << u << " - " << v
-                << " \tÈ¨ÖØ: " << currentEdge->getWeight() << std::endl;
+            std::cout << "æ·»åŠ ç¬¬" << (resultCount + 1) << "æ¡è¾¹: "
+                << u << " - " << v << " æƒé‡: " << currentEdge->getWeight() << std::endl;
             resultCount++;
         }
+        else {
+            std::cout << "è·³è¿‡è¾¹: " << u << " - " << v
+                << " æƒé‡: " << currentEdge->getWeight() << " (ä¼šå½¢æˆç¯è·¯)" << std::endl;
+        }
     }
 
-    // Êä³ö½á¹û
+    // è¾“å‡ºæœ€ç»ˆç»“æœ
+    std::cout << "\n=== Kruskalç®—æ³•æ‰§è¡Œå®Œæˆ ===" << std::endl;
+
     if (resultCount == vertices - 1) {
-        std::cout << "\n×îĞ¡Éú³ÉÊ÷¹¹½¨³É¹¦!" << std::endl;
-        std::cout << "×îĞ¡Éú³ÉÊ÷°üº¬ " << resultCount << " Ìõ±ß:" << std::endl;
+        std::cout << "æœ€å°ç”Ÿæˆæ ‘æ„å»ºæˆåŠŸ!" << std::endl;
+        std::cout << "æœ€å°ç”Ÿæˆæ ‘åŒ…å« " << resultCount << " æ¡è¾¹:" << std::endl;
+        std::cout << "èµ·ç‚¹\tç»ˆç‚¹\tæƒé‡" << std::endl;
+        std::cout << "---------------------" << std::endl;
+
         for (int i = 0; i < resultCount; i++) {
-            std::cout << result[i]->getSrc() << " - " << result[i]->getDest()
-                << " \tÈ¨ÖØ: " << result[i]->getWeight() << std::endl;
+            std::cout << result[i]->getSrc() << "\t" << result[i]->getDest()
+                << "\t" << result[i]->getWeight() << std::endl;
         }
-        std::cout << "×ÜÈ¨ÖØ: " << totalWeight << std::endl;
+        std::cout << "æ€»æƒé‡: " << totalWeight << std::endl;
     }
     else {
-        std::cout << "\nÍ¼²»Á¬Í¨£¬ÎŞ·¨Éú³ÉÍêÕûµÄ×îĞ¡Éú³ÉÊ÷" << std::endl;
-        std::cout << "Ö»ÕÒµ½ÁË " << resultCount << " Ìõ±ß£¬ĞèÒª " << (vertices - 1) << " Ìõ±ß" << std::endl;
+        std::cout << "å›¾ä¸è¿é€šï¼Œæ— æ³•ç”Ÿæˆå®Œæ•´çš„æœ€å°ç”Ÿæˆæ ‘" << std::endl;
+        std::cout << "åªæ‰¾åˆ°äº† " << resultCount << "æ¡è¾¹ï¼Œéœ€è¦ "<<(vertices - 1) << " æ¡è¾¹" << std::endl;
+
     }
 
-    // ÊÍ·ÅÄÚ´æ
+    // é‡Šæ”¾å†…å­˜
     for (int i = 0; i < edgeCount; i++) {
         delete edges[i];
     }

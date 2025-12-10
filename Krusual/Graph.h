@@ -2,7 +2,6 @@
 #define GRAPH_H
 
 #include "Edge.h"
-#include "HeapSort.h"
 class UnionFind; // 前向声明
 
 class Graph {
@@ -12,7 +11,6 @@ private:
     Edge** edgesArray; // 边数组
     int edgeCount;    // 当前边数
     int maxEdges;     // 最大边数容量
-    HeapSort heapSorter;
     // 堆排序相关方法
     void heapify(Edge* edges[], int n, int i, Edge* temp) const;
     void buildHeap(Edge* edges[], int n, Edge* temp)const;
