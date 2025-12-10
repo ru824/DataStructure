@@ -3,20 +3,20 @@
   "WorkspaceRootPath": "D:\\DataStructure\\Krusual\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{690CFD72-596D-4625-9508-058F3124C524}|Krusual.vcxproj|D:\\DataStructure\\Krusual\\Graph.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{690CFD72-596D-4625-9508-058F3124C524}|Krusual.vcxproj|solutionrelative:Graph.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{690CFD72-596D-4625-9508-058F3124C524}|Krusual.vcxproj|D:\\DataStructure\\Krusual\\GraphFileIO.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{690CFD72-596D-4625-9508-058F3124C524}|Krusual.vcxproj|solutionrelative:GraphFileIO.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{690CFD72-596D-4625-9508-058F3124C524}|Krusual.vcxproj|D:\\DataStructure\\Krusual\\Graph.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{690CFD72-596D-4625-9508-058F3124C524}|Krusual.vcxproj|solutionrelative:Graph.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{690CFD72-596D-4625-9508-058F3124C524}|Krusual.vcxproj|D:\\DataStructure\\Krusual\\Edge.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{690CFD72-596D-4625-9508-058F3124C524}|Krusual.vcxproj|solutionrelative:Edge.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{690CFD72-596D-4625-9508-058F3124C524}|Krusual.vcxproj|D:\\DataStructure\\Krusual\\Graph.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{690CFD72-596D-4625-9508-058F3124C524}|Krusual.vcxproj|solutionrelative:Graph.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{690CFD72-596D-4625-9508-058F3124C524}|Krusual.vcxproj|D:\\DataStructure\\Krusual\\GraphFileIO.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{690CFD72-596D-4625-9508-058F3124C524}|Krusual.vcxproj|solutionrelative:GraphFileIO.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{690CFD72-596D-4625-9508-058F3124C524}|Krusual.vcxproj|D:\\DataStructure\\Krusual\\Edge.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{690CFD72-596D-4625-9508-058F3124C524}|Krusual.vcxproj|solutionrelative:Edge.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{690CFD72-596D-4625-9508-058F3124C524}|Krusual.vcxproj|D:\\DataStructure\\Krusual\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
@@ -50,7 +50,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 9,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Bookmark",
@@ -106,7 +106,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "Edge.cpp",
               "DocumentMoniker": "D:\\DataStructure\\Krusual\\Edge.cpp",
               "RelativeDocumentMoniker": "Edge.cpp",
@@ -114,8 +114,7 @@
               "RelativeToolTip": "Edge.cpp",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAgAAAArAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-12-08T11:42:01.448Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-12-08T11:42:01.448Z"
             },
             {
               "$type": "Document",
@@ -127,18 +126,17 @@
               "RelativeToolTip": "main.cpp",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAABQAAAAFAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-12-08T11:52:04.449Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-12-08T11:52:04.449Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 0,
               "Title": "GraphFileIO.cpp",
               "DocumentMoniker": "D:\\DataStructure\\Krusual\\GraphFileIO.cpp",
               "RelativeDocumentMoniker": "GraphFileIO.cpp",
               "ToolTip": "D:\\DataStructure\\Krusual\\GraphFileIO.cpp",
               "RelativeToolTip": "GraphFileIO.cpp",
-              "ViewState": "AQIAAIAAAAAAAAAAAAAQwI8AAAAFAAAA",
+              "ViewState": "AQIAAEEAAAAAAAAAAAAQwI8AAAAFAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-12-08T13:04:33.134Z",
               "EditorCaption": ""
@@ -151,20 +149,20 @@
               "RelativeDocumentMoniker": "Graph.cpp",
               "ToolTip": "D:\\DataStructure\\Krusual\\Graph.cpp",
               "RelativeToolTip": "Graph.cpp",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAAAWAAAA",
+              "ViewState": "AQIAAIcAAAAAAAAAAAAAAJ0AAAAUAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-12-08T11:51:18.878Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "Graph.h",
               "DocumentMoniker": "D:\\DataStructure\\Krusual\\Graph.h",
               "RelativeDocumentMoniker": "Graph.h",
               "ToolTip": "D:\\DataStructure\\Krusual\\Graph.h",
               "RelativeToolTip": "Graph.h",
-              "ViewState": "AQIAAA8AAAAAAAAAAAAAABYAAAAAAAAA",
+              "ViewState": "AQIAAAMAAAAAAAAAAAAAABEAAAAHAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2025-12-08T11:50:55.087Z",
               "EditorCaption": ""

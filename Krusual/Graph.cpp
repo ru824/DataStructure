@@ -2,9 +2,8 @@
  * @file Graph.cpp
  * @brief 图数据结构实现文件，包含图的创建、操作和Kruskal算法
  * @class Graph
- * @brief 图类，使用边数组存储图结构，针对Kruskal算法优化
+ * @brief 图类，使用边数组存储图结构
  *
- * Kruskal算法以边为核心操作，使用边数组存储可以直接对边进行排序和筛选，比邻接矩阵更高效[3,5](@ref)。
  */
 
 #include "Graph.h"
@@ -17,7 +16,6 @@
   * @brief 图类构造函数
   * @param v 图中顶点数量，必须为正整数
   * @exception std::invalid_argument 当v<=0时抛出异常
-  * @note 初始化边数组，放弃邻接矩阵存储方式，专注于Kruskal算法需求[3,5](@ref)
   */
 Graph::Graph(int v) : vertices(v), edgeCount(0), maxEdges(v* (v - 1) / 2) {
     // 输入验证
@@ -39,7 +37,7 @@ Graph::Graph(int v) : vertices(v), edgeCount(0), maxEdges(v* (v - 1) / 2) {
 
 /**
  * @brief 图类析构函数
- * @note 释放边数组占用的所有内存资源，防止内存泄漏[1](@ref)
+ * @note 释放边数组占用的所有内存资源，防止内存泄漏
  */
 Graph::~Graph() {
     // 释放边数组
@@ -58,7 +56,7 @@ Graph::~Graph() {
  * @param v 边的目标顶点索引，范围[0, vertices-1]
  * @param weight 边的权重值
  * @exception std::out_of_range 当顶点索引越界时输出错误信息
- * @note 对于无向图，确保u < v以避免重复存储，提高Kruskal算法效率[3,7](@ref)
+ * @note 对于无向图，确保u < v以避免重复存储，提高Kruskal算法效率
  */
 void Graph::addEdge(int u, int v, int weight) {
     // 边界检查
@@ -72,12 +70,12 @@ void Graph::addEdge(int u, int v, int weight) {
         return;
     }
 
-    // 统一处理为u < v的形式，避免无向图中的重复边[7](@ref)
+    // 统一处理为u < v的形式，避免无向图中的重复边
     if (u > v) {
         std::swap(u, v);
     }
 
-    // 检查边是否已存在
+    // 检查边是否已存在,已经存在则更新边的权重
     for (int i = 0; i < edgeCount; ++i) {
         if (edgesArray[i] != nullptr &&
             edgesArray[i]->getSrc() == u && edgesArray[i]->getDest() == v) {
@@ -105,7 +103,6 @@ void Graph::addEdge(int u, int v, int weight) {
 
 /**
  * @brief 打印图的边列表信息
- * @note 仅打印边数组内容，不再显示邻接矩阵[5](@ref)
  */
 void Graph::printGraph() const {
     std::cout << "\n图信息概览:" << std::endl;
@@ -135,15 +132,14 @@ void Graph::printGraph() const {
  * @param edges 边指针数组
  * @param n 当前堆的大小
  * @param i 需要堆化的子树根节点索引
- * @param temp 临时边对象，用于交换操作
- * @note 维护最大堆性质，时间复杂度O(log n)[1](@ref)
+ * @note 维护最大堆性质，时间复杂度O(log n)
  */
-void Graph::heapify(Edge* edges[], int n, int i, Edge* temp) const {
+void Graph::heapify(Edge* edges[], int n, int i) const {
     int largest = i;
     int left = 2 * i + 1;
     int right = 2 * i + 2;
 
-    // 找到左子节点、右子节点和当前节点中的最大值[1](@ref)
+    // 找到左子节点、右子节点和当前节点中的最大值
     if (left < n && edges[left]->getWeight() > edges[largest]->getWeight()) {
         largest = left;
     }
@@ -152,64 +148,53 @@ void Graph::heapify(Edge* edges[], int n, int i, Edge* temp) const {
         largest = right;
     }
 
-    // 如果最大值不是当前节点，交换并递归调整[1](@ref)
+    // 如果最大值不是当前节点，交换并递归调整
     if (largest != i) {
-        // 使用第三个数组temp作为临时存储进行交换
-        *temp = *edges[i];
-        *edges[i] = *edges[largest];
-        *edges[largest] = *temp;
+        // 直接交换指针，无需临时对象
+        Edge* temp = edges[i];
+        edges[i] = edges[largest];
+        edges[largest] = temp;
 
-        heapify(edges, n, largest, temp);
+        // 递归调整受影响子树
+        heapify(edges, n, largest);
     }
 }
-
 /**
  * @brief 构建最大堆
  * @param edges 边指针数组
  * @param n 数组大小
- * @param temp 临时边对象，用于交换操作
- * @note 从最后一个非叶子节点开始构建堆，时间复杂度O(n)[1](@ref)
+ * @note 从最后一个非叶子节点开始构建堆，时间复杂度O(n)，原地操作
  */
-void Graph::buildHeap(Edge* edges[], int n, Edge* temp) const {
-    // 从最后一个非叶子节点开始构建堆[1](@ref)
+void Graph::buildHeap(Edge* edges[], int n) const {
+    // 从最后一个非叶子节点开始构建堆
     for (int i = n / 2 - 1; i >= 0; i--) {
-        heapify(edges, n, i, temp);
+        heapify(edges, n, i);
     }
 }
-
 /**
  * @brief 对边数组进行堆排序
  * @param edges 边指针数组
  * @param n 数组大小
- * @note 使用堆排序算法对边按权重升序排列，时间复杂度O(n log n)[1](@ref)
+ * @note 使用堆排序算法对边按权重升序排列，时间复杂度O(n log n)，完全原地操作
  */
 void Graph::heapSortEdges(Edge* edges[], int n) const {
     if (n <= 1) return;
 
-    // 创建第三个数组作为辅助空间
-    Edge* temp = new Edge();
+    // 构建最大堆
+    buildHeap(edges, n);
 
-    // 构建最大堆[1](@ref)
-    buildHeap(edges, n, temp);
-
-    // 逐个从堆中提取元素[1](@ref)
+    // 逐个从堆中提取元素
     for (int i = n - 1; i > 0; i--) {
-        // 将当前堆顶元素（最大值）与末尾元素交换
-        *temp = *edges[0];
-        *edges[0] = *edges[i];
-        *edges[i] = *temp;
-
-        // 调整剩余元素，堆大小减1
-        heapify(edges, i, 0, temp);
+        // 交换堆顶元素（最大值）与当前末尾元素
+        std::swap(edges[0], edges[i]);
+        // 调整剩余元素，堆大小减1：相当于隐藏已经完成排序的部分
+        heapify(edges, i, 0);
     }
-
-    delete temp;
 }
-
 
 /**
  * @brief 使用Kruskal算法求解最小生成树
- * @note 基于并查集和堆排序实现，专门为边数组存储优化[3,5,7](@ref)
+ * @note 基于并查集和堆排序实现，专门为边数组存储优化
  * @exception std::runtime_error 当图不连通时无法生成完整最小生成树
  */
 void Graph::kruskalMST() const {
@@ -247,7 +232,7 @@ void Graph::kruskalMST() const {
 
     std::cout << "\n开始构建最小生成树:" << std::endl;
 
-    // Kruskal算法核心：遍历排序后的边，使用并查集避免环路[3,7](@ref)
+    // Kruskal算法核心：遍历排序后的边，使用并查集避免环路
     for (int i = 0; i < edgeCount && resultCount < vertices - 1; i++) {
         Edge* currentEdge = edges[i];
         int u = currentEdge->getSrc();
