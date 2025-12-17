@@ -1,5 +1,0 @@
-﻿  main.cpp
-D:\DataStructure\Krusual\main.cpp(38,26): warning C4566: 由通用字符名称“\u2713”表示的字符不能在当前代码页(936)中表示出来
-D:\DataStructure\Krusual\main.cpp(43,26): warning C4566: 由通用字符名称“\u2717”表示的字符不能在当前代码页(936)中表示出来
-D:\DataStructure\Krusual\main.cpp(86,44): error C2248: “GraphFileIO::calculateDistance”: 无法访问 private 成员(在“GraphFileIO”类中声明)
-D:\DataStructure\Krusual\main.cpp(132,48): error C2248: “GraphFileIO::calculateDistance”: 无法访问 private 成员(在“GraphFileIO”类中声明)
